@@ -1,11 +1,14 @@
 // Dependencies
 const express = require('express');
+const bodyParser = require('body-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
-// Scraping Tools
-const axios = require('axios');
-const cheerio = require('cheerio');
+// const database = require('./models');
+// Routes
+const routes = require('./routes/routes');
+// const scrape = require('./routes/scrape');
+// const articles = require('./routes/articles');
 
 // Require all models
 // const models = require('./models');
@@ -17,11 +20,11 @@ const app = express();
 
 // Configure middleware
 app.use(logger('dev'));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Initialize Handlebars
-app.engine('handlebar', exphbs({ defaultLayout: 'main' }));
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
 // Public directory
@@ -45,7 +48,10 @@ db.on('error', (err) => {
 db.on('open', () => {
   console.log('Mongoose connection successful.');
 });
+
 // Routes
+app.use('/', routes);
+require('./controllers/ScrapeController')(app);
 
 // Start the server
 app.listen(PORT, () => {
