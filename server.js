@@ -1,59 +1,56 @@
-// Dependencies
-const express = require('express');
-const bodyParser = require('body-parser');
-const logger = require('morgan');
-const mongoose = require('mongoose');
-const exphbs = require('express-handlebars');
-// const database = require('./models');
-// Routes
-const routes = require('./routes/routes');
-// const scrape = require('./routes/scrape');
-// const articles = require('./routes/articles');
-
-// Require all models
-// const models = require('./models');
+//require dependencies
+const express = require('express')
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const logger = require("morgan");
+const exphbs = require("express-handlebars");
+const methodOverride = require("method-override");
 
 const PORT = process.env.PORT || 3000;
+// initialize express
+const app = express()
 
-// Initialize Express
-const app = express();
+// Set up an Express Router
+const router = express.Router();
 
-// Configure middleware
-app.use(logger('dev'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// Require our routes file pass our router object
+require("./routes/routes")(router);
 
-// Initialize Handlebars
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
-app.set('view engine', 'handlebars');
+// Use morgan and body parser with our app
+app.use(logger("dev"));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-// Public directory
-app.use(express.static('public'));
+// Make public a static dir
+app.use(express.static("public"));
 
-// Database configuration with mongoose
+// Have every request go through our router middleware
+app.use(router);
+
+// Set Handlebars.
+
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+app.use(methodOverride("_method"));
+
 const databaseUrl = 'mongodb://thomwint:Britty123!@ds155903.mlab.com:55903/heroku_1wj8v9tt';
-
-if (process.env.MONGODB_URL) {
-  mongoose.connect(process.env.MONGODB_URL);
-} else {
-  mongoose.connect(databaseUrl);
+if(process.env.MONGODB_URI){
+	mongoose.connect(process.env.MONGODB_URI);
+}else {
+	mongoose.connect(databaseUrl)
 }
 
 const db = mongoose.connection;
 
-db.on('error', (err) => {
+db.on('error', err => {
   console.log(`Mongoose Error: ${err}`);
 });
 
-db.on('open', () => {
-  console.log('Mongoose connection successful.');
+db.once("open", () => {
+  console.log("Mongoose connection successful.");
 });
 
-// Routes
-app.use('/', routes);
-require('./controllers/ScrapeController')(app);
-
-// Start the server
 app.listen(PORT, () => {
-  console.log(`App running on port: ${PORT}!`);
+  console.log("App running on port 3000!");
 });

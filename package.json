@@ -27,10 +27,5 @@
     "mongoose": "^5.3.10",
     "morgan": "^1.9.1",
     "router": "^1.3.3"
-  },
-  "devDependencies": {
-    "eslint": "^5.8.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0"
   }
 }
